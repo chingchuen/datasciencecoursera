@@ -1,0 +1,47 @@
+---
+title: "Data Product Assignment - Interactive Plot in Rmarkdown Presentation"
+author: "Chan Ching Chuen"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+```
+
+## Interactive Chart - Stock Price Comparison
+
+```{r , echo=FALSE}
+library(dplyr)
+library(tidyquant)
+library(tidyr)
+library(plotly)
+
+
+tickers <- c("2800.HK", "0005.HK", "1299.HK", "2318.HK")
+
+data <- tq_get(tickers, from="2019-01-01", to="2023-06-30", get="stock.prices")
+
+data <- as.data.frame(data)
+
+data <- data[c("symbol", "date", "adjusted")]
+
+colnames(data) <- c("stock","date","price")
+
+#initprice <- data[data$dat=="2019-01-02",]
+
+data <- data %>% 
+  group_by(stock) %>% 
+  mutate(adj_price = price/price[date=="2019-01-02"]*100)
+
+plot1 <- plot_ly(data, x=~date, y=~adj_price, color=~stock, type="scatter", mode="line")
+
+plot1 <- layout(plot1, title="Stock Price Movement, 2019-01-01=100")
+
+plot1
+
+
+
+
+```
+
